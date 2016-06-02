@@ -45,6 +45,13 @@ class Telegram
      * @var string
      */
     protected $bot_name = '';
+    
+    /**
+     * Telegram Bot options
+     *
+     * @var array
+     */
+    protected $bot_options = ['setDefaultCommandsPath' => true];
 
     /**
      * Raw request data (json) for webhook methods
@@ -129,7 +136,7 @@ class Telegram
      * @param string $api_key
      * @param string $bot_name
      */
-    public function __construct($api_key, $bot_name)
+    public function __construct($api_key, $bot_name, $bot_options = [])
     {
         if (empty($api_key)) {
             throw new TelegramException('API KEY not defined!');
@@ -141,13 +148,16 @@ class Telegram
 
         $this->api_key = $api_key;
         $this->bot_name = $bot_name;
+        $this->bot_options = array_merge($this->bot_options, $bot_options);
 
         //Set default download and upload path
         $this->setDownloadPath(BASE_PATH . '/../Download');
         $this->setUploadPath(BASE_PATH . '/../Upload');
-
+    
         //Add default system commands path
-        $this->addCommandsPath(BASE_COMMANDS_PATH . '/SystemCommands');
+        if ($this->bot_options['setDefaultCommandsPath'] != false){
+            $this->addCommandsPath(BASE_COMMANDS_PATH . '/SystemCommands');
+        }
 
         Request::initialize($this);
     }
